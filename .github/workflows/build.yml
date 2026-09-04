@@ -25,15 +25,30 @@ jobs:
           cache: true
 
       - name: Create Android Platform Files
+        run: flutter create . --platforms=android --project-name=azkar_app
+
+      - name: Change App Name
         run: |
-          flutter create . --platforms=android --project-name=azkar_app
-          sed -i 's/android:label="azkar_app"/android:label="زاد الذاكرين"/g' android/app/src/main/AndroidManifest.xml
+          python3 -c "
+          p = 'android/app/src/main/AndroidManifest.xml'
+          with open(p, 'r', encoding='utf-8') as f:
+              c = f.read()
+          c = c.replace('android:label=\"azkar_app\"', 'android:label=\"زاد الذاكرين\"')
+          with open(p, 'w', encoding='utf-8') as f:
+              f.write(c)
+          "
 
       - name: Install dependencies
         run: flutter pub get
 
       - name: Build APK
         run: flutter build apk --release
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Azkar-App
+          path: build/app/outputs/flutter-apk/app-release.apk
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
